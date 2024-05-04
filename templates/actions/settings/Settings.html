@@ -1,0 +1,197 @@
+<h1>БонусПЛЮС</h1>
+
+<div class="fields form">
+    <form action="?module=plugins&id=bonusplus&action=save" method="post" id="plugins-settings-form">
+        {$wa->csrf()}
+        <div class="field">
+            <div class="name"><label for="bonusplus_shop_bonusplus_syncStatus">Включить</label></div>
+            <div class="value"><input type="checkbox" name="shop_bonusplus[syncStatus]" value="1" class="checkbox"
+                                      {if $settings.syncStatus == 1} checked="checked"{/if} id="bonusplus_shop_bonusplus_syncStatus" title="Включить">
+                <br><span class="hint">Включить плагин</span></div>
+        </div>
+        <div class="field">
+            <div class="name"><label for="bonusplus_shop_bonusplus_token">Ключ Бонус Плюс</label></div>
+            <div class="value"><input id="bonusplus_shop_bonusplus_token" type="text" name="shop_bonusplus[token]"
+                                      class="input" title="Ключ Бонус Плюс"
+                                      value="{if isset($settings.token)}{$settings.token}{/if}"> <br>
+                {if isset($settings.tokenMSG)}<span class="hint">{$settings.tokenMSG}</span><br>{/if}
+                <span class="hint">Введите ключ полученный в <a
+                    href="https://bonusplus.pro/lk_new/#/integrations/bonusplusapi/" target="_blank">личном кабинете</a></span>
+            </div>
+        </div>
+        <div class="field">
+            <div class="name"><label for="bonusplus_shop_bonusplus_hookStatus">Подписка на webhook</label></div>
+            <div class="value">
+                <select name="shop_bonusplus[hookStatus]" autocomplete="off" id="bonusplus_shop_bonusplus_hookStatus" class="select" title="Подписка на webhook">
+                    <option value="1" {if $settings.hookStatus == 1}selected="selected"{/if}>Активна</option>
+                    <option value="0" {if $settings.hookStatus == 0 or !isset($settings.hookStatus)}selected="selected"{/if}>Выключена</option>
+                </select>
+            </div>
+        </div>
+        <br><br>
+        <div class="block">
+            <ul class="tabs">
+                <li class="selected">
+                    <a data-link="rule">Правила лояльности</a>
+                </li>
+                <li>
+                    <a data-link="reg">Регистрация новых пользователей</a>
+                </li>
+                <li>
+                    <a data-link="cron">Синхронизация CRON</a>
+                </li>
+
+            </ul>
+        </div>
+        {if !empty($category)}
+        <br><br>
+        <div class="cont" data-tab="reg">
+            <div class="field">
+                <div class="name"><label for="bonusplus_shop_bonusplus_regUsers">Регистрировать новых покупателей магазина в БонусПЛЮС</label></div>
+                <div class="value">
+                    <select name="shop_bonusplus[regUsers]" autocomplete="off" id="bonusplus_shop_bonusplus_regUsers" class="select" title="Регистрировать новых покупателей магазина в БонусПЛЮС">
+                        <option value="1" {if $settings.regUsers == 1}selected="selected"{/if}>Да</option>
+                        <option value="0" {if $settings.regUsers == 0 or !isset($settings.regUsers)}selected="selected"{/if}>Нет</option>
+                    </select>
+                </div>
+            </div>
+            <br><br>
+            <h4>Добавлять контакты при регистрации в группу</h4>
+            <div class="field-group">
+                {foreach $category as $item => $val }
+                    {if empty($val.system_id)}
+                    <div class="field">
+                        <div class="name"><label for="bonusplus_shop_bonusplus_store_cat_{$val.id}">{$val.name}</label></div>
+                        <div class="value" style="width: auto; display: flex">
+                            <div class="row">
+                                {$cur = cat_|cat:$val.id}
+                                <input id="bonusplus_shop_bonusplus_cat_{$val.id}" type="text" name="shop_bonusplus[{$cur}]"  class="input" {if !empty($user_category) && isset($user_category[$cur])}value="{$user_category[$cur]}"{/if} title="{$val.name}" style="min-width: 50px;width: 90px;"><br>
+                                <span class="hint">id карты лояльности</span>
+                            </div>
+                            <div class="row" style="margin-left: 0.6rem">
+                                {$cur = hello_|cat:$val.id}
+                                <input type="text" name="shop_bonusplus[{$cur}]" class="input" {if !empty($user_category) && isset($user_category[$cur])}value="{$user_category[$cur]}"{/if} title="{$val.name}" style="min-width: 50px;width: 90px;"><br>
+                                <span class="hint">Бонус за регистрацию</span>
+                            </div>
+                        </div>
+                    </div>
+                    {/if}
+                {/foreach}
+            </div>
+        </div>
+        {/if}
+        <div class="cont" data-tab="cron">
+            <h4>Синхронизация CRON</h4>
+            <div class="field">
+                <div class="name">
+                    Задание CRON
+                </div>
+                <div class="value">
+                    {strip}
+                    <pre style="background-color: rgba(	0, 153, 153, 0.5); padding: 1em !important; font-size: 1.1em; overflow-x: auto; word-wrap: break-word; white-space: pre-wrap; margin-bottom:0;">
+                            php {$wa_root_path}/cli.php shop bonusplus
+                    </pre>
+                    {/strip}
+                    <span class="hint">Добавьте данное задание с частотой запуска, не чаще 1 раза в час.</span>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="name"><label for="bonusplus_shop_bonusplus_regCron">Зарегистрировать покупателей магазина в БонусПЛЮС</label></div>
+                <div class="value">
+                    <select name="shop_bonusplus[regCron]" autocomplete="off" id="bonusplus_shop_bonusplus_regCron" class="select" title="Зарегистрировать покупателей магазина в БонусПЛЮС">
+                        <option value="1" {if $settings.regCron == 1}selected="selected"{/if}>Да</option>
+                        <option value="0" {if $settings.regCron == 0 or !isset($settings.regCron)}selected="selected"{/if}>Нет</option>
+                    </select>
+                    {if isset($settings.sucMSG)}
+                        <span class="hint">{$settings.sucMSG}</span>
+                    {/if}
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="name"><label for="bonusplus_shop_bonusplus_loyalSync">Обновлять уровень лояльности покупателей магазина из БонусПЛЮС</label></div>
+                <div class="value">
+                    <select name="shop_bonusplus[loyalSync]" autocomplete="off" id="bonusplus_shop_bonusplus_loyalSync" class="select" title="Обновлять уровень лояльности покупателей магазина из БонусПЛЮС">
+                        <option value="1" {if $settings.loyalSync == 1}selected="selected"{/if}>Да</option>
+                        <option value="0" {if $settings.loyalSync == 0 or !isset($settings.loyalSync)}selected="selected"{/if}>Нет</option>
+                    </select>
+                    {if isset($settings.sucMSG)}
+                    <span class="hint">{$settings.sucMSG}</span>
+                    {/if}
+                </div>
+            </div>
+
+        </div>
+        <div class="cont" data-tab="rule">
+            <h4>Укажите диапазон суммы покупок(на основе этих правил пользователи будут перемещаться по группам лояльности)</h4>
+            <br><br>
+            <div class="field-group">
+                {foreach $category as $item => $val }
+                {if empty($val.system_id)}
+                <div class="field">
+                    <div class="name"><label for="bonusplus_shop_bonusplus_store_loyal_{$val.id}">{$val.name}</label></div>
+                    <div class="value" style="width: auto; display: flex" id="bonusplus_shop_bonusplus_store_loyal_{$val.id}">
+                        <div class="row">
+                            {$cur = min_|cat:$val.id}
+                            <input type="text" name="shop_bonusplus[{$cur}]"  class="input" {if !empty($user_loyal) && isset($user_loyal[$cur])}value="{$user_loyal[$cur]}"{/if} title="{$val.name}" style="min-width: 50px;width: 90px;"><br>
+                            <span class="hint">от</span>
+                        </div>
+                        <div class="row" style="margin-left: 0.6rem">
+                            {$cur = max_|cat:$val.id}
+                            <input type="text" name="shop_bonusplus[{$cur}]" class="input" {if !empty($user_loyal) && isset($user_loyal[$cur])}value="{$user_loyal[$cur]}"{/if} title="{$val.name}" style="min-width: 50px;width: 90px;"><br>
+                            <span class="hint">до</span>
+                        </div>
+                    </div>
+                </div>
+                {/if}
+                {/foreach}
+            </div>
+            {if !empty($category)}
+            <br><br>
+            <div class="field-group">
+                <h4>Назначить уровень лояльности в системе для групп покупателей</h4>
+                {foreach $category as $item => $val }
+                {if empty($val.system_id)}
+                <div class="field">
+                    <div class="name"><label for="bonusplus_shop_bonusplus_syst_card_{$val.id}">{$val.name}</label></div>
+                    <div class="value" style="width: auto; display: flex">
+                        <div class="row">
+                            {$cur = card_|cat:$val.id}
+                            <input id="bonusplus_shop_bonusplus_syst_card_{$val.id}" type="text" name="shop_bonusplus[{$cur}]"  class="input" {if !empty($user_card) && isset($user_card[$cur])}value="{$user_card[$cur]}"{/if} title="{$val.name}" style="min-width: 50px;width: 90px;"><br>
+                            <span class="hint">Название карты в системе</span>
+                        </div>
+                    </div>
+                </div>
+                {/if}
+                {/foreach}
+            </div>
+            {/if}
+        </div>
+            <div class="field">
+                <div class="value submit">
+                    <input type="submit" class="button green" value="Сохранить">
+                    <span id="plugins-settings-form-status" style="display:none"><!-- message placeholder --></span>
+                </div>
+            </div>
+
+
+    </form>
+    {literal}
+        <script>
+            $(document).ready(function () {
+                let active = '';
+                $('.cont').hide();
+                $("[data-tab='rule']").show();
+                $("[data-link='rule']").parent().addClass('selected');
+
+                $('[data-link]').on('click', function () {
+                    active = $(this).attr('data-link');
+                    $('.cont').hide();
+                    $('.tabs li').removeClass('selected');
+                    $(this).parent().addClass('selected');
+                    $(`[data-tab='${active}']`).show();
+                })
+            })
+        </script>
+    {/literal}
